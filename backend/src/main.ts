@@ -10,13 +10,18 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true,
+    forbidNonWhitelisted: false,
   }));
   
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:8080'],
+    origin: ['http://localhost:8080', 'http://localhost:3000', 'http://localhost:4200'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
   
-  await app.listen(3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Server running on http://localhost:${port}`);
+  console.log(`API available at http://localhost:${port}/api`);
 }
 bootstrap();

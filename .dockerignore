@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+.pnp.*
+.yarn
+
+# Build output
+**/dist
+**/build
+**/coverage
+*.tsbuildinfo
+**/.dart_tool
+
+# OpenCode
+.opencode
+opencode.json
+AGENTS.md
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE / OS
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs

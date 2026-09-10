@@ -27,3 +27,15 @@ export interface GeoJsonPoint {
   type: 'Point';
   coordinates: [number, number];
 }
+
+export interface RadiusSearchDto {
+  location: GeoLocation;
+  radiusInMeters: number;
+  serviceType?: string;
+}
+
+export interface HandymanLocation {
+  userId: string;
+  location: GeoJsonPoint;
+  updatedAt: Date;
+}

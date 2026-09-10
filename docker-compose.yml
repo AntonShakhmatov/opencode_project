@@ -1,0 +1,67 @@
+services:
+  # PostgreSQL with PostGIS extension
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: handyman-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: handyman_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d handyman_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # NestJS backend API
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: handyman-backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: handyman_db
+      DB_SYNCHRONIZE: "true"
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Vue 2 admin panel
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+    container_name: handyman-admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Flutter web app
+  mobile-web:
+    build:
+      context: .
+      dockerfile: mobile/Dockerfile.web
+    container_name: handyman-mobile-web
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

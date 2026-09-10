@@ -58,6 +58,11 @@ temp/
 *.tmp
 *.temp
 
+# Scratch / manual test scripts
+backend/test-location.js
+backend/ws-test.js
+admin/public/test.html
+
 # Flutter
 .flutter-plugins
 .flutter-plugins-dependencies

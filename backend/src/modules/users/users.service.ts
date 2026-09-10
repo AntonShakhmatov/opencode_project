@@ -36,6 +36,14 @@ export class UsersService {
     return user;
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);
