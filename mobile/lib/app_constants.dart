@@ -14,3 +14,42 @@ class DemoLocation {
   static const double latitude = 40.7128;
   static const double longitude = -74.0060;
 }
+
+/// Shared helpers for job status rendering.
+Color jobStatusColor(String status) {
+  switch (status) {
+    case 'matched':
+      return Colors.blue;
+    case 'accepted':
+      return Colors.orange;
+    case 'en_route':
+      return Colors.teal;
+    case 'in_progress':
+      return Colors.purple;
+    case 'completed':
+      return Colors.green;
+    case 'cancelled':
+      return Colors.red;
+    default:
+      return Colors.grey;
+  }
+}
+
+String jobStatusLabel(String status) {
+  switch (status) {
+    case 'matched':
+      return 'New Offer';
+    case 'accepted':
+      return 'Accepted';
+    case 'en_route':
+      return 'On the Way';
+    case 'in_progress':
+      return 'In Progress';
+    case 'completed':
+      return 'Completed';
+    case 'cancelled':
+      return 'Cancelled';
+    default:
+      return status;
+  }
+}

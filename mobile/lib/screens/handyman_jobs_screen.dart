@@ -5,6 +5,7 @@ import '../models/job.dart';
 import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
 import 'chat_screen.dart';
+import 'job_detail_screen.dart';
 
 class HandymanJobsScreen extends StatefulWidget {
   const HandymanJobsScreen({super.key});
@@ -35,44 +36,6 @@ class _HandymanJobsScreenState extends State<HandymanJobsScreen>
     final jobProvider = context.read<JobProvider>();
     if (auth.token != null && auth.userId != null) {
       await jobProvider.fetchHandymanJobs(auth.token!, auth.userId!);
-    }
-  }
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'matched':
-        return Colors.blue;
-      case 'accepted':
-        return Colors.orange;
-      case 'en_route':
-        return Colors.teal;
-      case 'in_progress':
-        return Colors.purple;
-      case 'completed':
-        return Colors.green;
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'matched':
-        return 'New Offer';
-      case 'accepted':
-        return 'Accepted';
-      case 'en_route':
-        return 'On the Way';
-      case 'in_progress':
-        return 'In Progress';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return status;
     }
   }
 
@@ -134,38 +97,41 @@ class _HandymanJobsScreenState extends State<HandymanJobsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _statusColor(job.status).withAlpha(30),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    _statusLabel(job.status),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: _statusColor(job.status),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _openDetail(job),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: jobStatusColor(job.status).withAlpha(30),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      jobStatusLabel(job.status),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: jobStatusColor(job.status),
+                      ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  _formatDate(job.createdAt),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
+                  const Spacer(),
+                  Text(
+                    _formatDate(job.createdAt),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -221,7 +187,17 @@ class _HandymanJobsScreenState extends State<HandymanJobsScreen>
               _buildActionButtons(job, auth, jobProvider),
             ],
           ],
+          ),
         ),
+      ),
+    );
+  }
+
+  void _openDetail(Job job) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => JobDetailScreen(job: job),
       ),
     );
   }
@@ -349,7 +325,7 @@ class _HandymanJobsScreenState extends State<HandymanJobsScreen>
       MaterialPageRoute(
         builder: (_) => ChatScreen(
           jobId: job.id,
-          jobTitle: '${job.serviceType} — ${_statusLabel(job.status)}',
+          jobTitle: '${job.serviceType} — ${jobStatusLabel(job.status)}',
         ),
       ),
     );

@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../app_constants.dart';
+import '../models/job.dart';
 import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
 import '../services/socket_service.dart';
 import 'create_job_screen.dart';
+import 'job_detail_screen.dart';
 import 'job_list_screen.dart';
 import 'profile_screen.dart';
 import 'handyman_jobs_screen.dart';
@@ -67,11 +69,21 @@ class _HomeScreenState extends State<HomeScreen> {
               action: SnackBarAction(
                 label: 'View',
                 textColor: Colors.white,
-                onPressed: () {
+                onPressed: () async {
+                  final jobId = data['jobId'];
+                  Job? job;
+                  if (auth.token != null && jobId != null) {
+                    job = await context
+                        .read<JobProvider>()
+                        .fetchJobById(jobId.toString(), auth.token);
+                  }
+                  if (!mounted) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const HandymanJobsScreen(),
+                      builder: (_) => job != null
+                          ? JobDetailScreen(job: job)
+                          : const HandymanJobsScreen(),
                     ),
                   );
                 },

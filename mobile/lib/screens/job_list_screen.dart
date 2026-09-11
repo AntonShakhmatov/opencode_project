@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
 import '../providers/review_provider.dart';
 import 'chat_screen.dart';
+import 'job_detail_screen.dart';
 import 'rate_job_screen.dart';
 
 class JobListScreen extends StatefulWidget {
@@ -31,44 +32,6 @@ class _JobListScreenState extends State<JobListScreen> {
       await jobProvider.fetchHandymanJobs(auth.token!, auth.userId!);
     } else {
       await jobProvider.fetchClientJobs(auth.token!, auth.userId!);
-    }
-  }
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'matched':
-        return Colors.blue;
-      case 'accepted':
-        return Colors.orange;
-      case 'en_route':
-        return Colors.teal;
-      case 'in_progress':
-        return Colors.purple;
-      case 'completed':
-        return Colors.green;
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'matched':
-        return 'Matched';
-      case 'accepted':
-        return 'Accepted';
-      case 'en_route':
-        return 'On the Way';
-      case 'in_progress':
-        return 'In Progress';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return status;
     }
   }
 
@@ -115,9 +78,12 @@ class _JobListScreenState extends State<JobListScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _openDetail(job),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -128,15 +94,15 @@ class _JobListScreenState extends State<JobListScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _statusColor(job.status).withAlpha(30),
+                    color: jobStatusColor(job.status).withAlpha(30),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    _statusLabel(job.status),
+                    jobStatusLabel(job.status),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: _statusColor(job.status),
+                      color: jobStatusColor(job.status),
                     ),
                   ),
                 ),
@@ -216,7 +182,17 @@ class _JobListScreenState extends State<JobListScreen> {
               ),
             ],
           ],
+          ),
         ),
+      ),
+    );
+  }
+
+  void _openDetail(Job job) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => JobDetailScreen(job: job),
       ),
     );
   }

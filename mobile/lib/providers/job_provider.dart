@@ -243,6 +243,33 @@ class JobProvider extends ChangeNotifier {
     }
   }
 
+  Future<Job?> fetchJobById(String jobId, String? token) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await ApiService.get('/jobs/$jobId', token: token);
+      final data = response['data'] ?? response;
+      if (data is Map<String, dynamic> && data['id'] != null) {
+        final job = Job.fromJson(data);
+        addJobFromSocket(job);
+        return job;
+      }
+      _error = 'Failed to fetch job';
+      return null;
+    } on ApiException catch (e) {
+      _error = e.message;
+      return null;
+    } catch (e) {
+      _error = e.toString();
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void addJobFromSocket(Job job) {
     final index = _jobs.indexWhere((j) => j.id == job.id);
     if (index == -1) {
@@ -268,6 +295,7 @@ class JobProvider extends ChangeNotifier {
         latitude: old.latitude,
         longitude: old.longitude,
         address: old.address,
+        handymanName: changes['handymanName'] ?? old.handymanName,
         estimatedPrice: old.estimatedPrice,
         finalPrice: old.finalPrice,
         scheduledAt: old.scheduledAt,
