@@ -8,6 +8,7 @@ class Job {
   final double latitude;
   final double longitude;
   final String? address;
+  final String? handymanName;
   final double? estimatedPrice;
   final double? finalPrice;
   final DateTime? scheduledAt;
@@ -26,6 +27,7 @@ class Job {
     required this.latitude,
     required this.longitude,
     this.address,
+    this.handymanName,
     this.estimatedPrice,
     this.finalPrice,
     this.scheduledAt,
@@ -47,6 +49,7 @@ class Job {
       latitude: coords != null ? (coords[1] as num).toDouble() : json['latitude']?.toDouble() ?? 0,
       longitude: coords != null ? (coords[0] as num).toDouble() : json['longitude']?.toDouble() ?? 0,
       address: json['address'],
+      handymanName: json['handyman']?['name'],
       estimatedPrice: json['estimatedPrice']?.toDouble(),
       finalPrice: json['finalPrice']?.toDouble(),
       scheduledAt: json['scheduledAt'] != null ? DateTime.parse(json['scheduledAt']) : null,
@@ -101,15 +104,35 @@ class Handyman {
   });
 
   factory Handyman.fromJson(Map<String, dynamic> json) {
+    final rawSkills = json['skills'];
+    final coords = json['location']?['coordinates'];
+
     return Handyman(
       userId: json['userId'],
       name: json['name'],
       avatar: json['avatar'],
-      rating: json['rating']?.toDouble(),
-      skills: json['skills'] != null ? List<String>.from(json['skills']) : null,
-      latitude: json['latitude']?.toDouble() ?? json['location']?['coordinates']?[1]?.toDouble(),
-      longitude: json['longitude']?.toDouble() ?? json['location']?['coordinates']?[0]?.toDouble(),
-      distanceInMeters: json['distanceInMeters']?.toDouble(),
+      rating: _parseDouble(json['rating']),
+      skills: rawSkills is String
+          ? rawSkills
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList()
+          : rawSkills is List
+              ? rawSkills.map((s) => s.toString()).toList()
+              : null,
+      latitude: (_parseDouble(json['latitude']) ??
+              _parseDouble(coords is List && coords.length > 1 ? coords[1] : null)) ??
+          0,
+      longitude: (_parseDouble(json['longitude']) ??
+              _parseDouble(coords is List && coords.isNotEmpty ? coords[0] : null)) ??
+          0,
+      distanceInMeters: _parseDouble(json['distanceInMeters']) ?? 0,
     );
+  }
+
+  static double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    return double.tryParse(value.toString());
   }
 }

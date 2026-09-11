@@ -122,9 +122,13 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      _error = 'Failed to load profile';
       return false;
     } on ApiException catch (e) {
       _error = e.message;
+      return false;
+    } catch (e) {
+      _error = 'Failed to load profile: $e';
       return false;
     }
   }
@@ -146,9 +150,13 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      _error = 'Failed to update profile';
       return false;
     } on ApiException catch (e) {
       _error = e.message;
+      return false;
+    } catch (e) {
+      _error = 'Failed to update profile: $e';
       return false;
     }
   }

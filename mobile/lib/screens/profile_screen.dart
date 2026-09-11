@@ -22,8 +22,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _syncProfile() async {
     setState(() => _isSyncing = true);
-    await context.read<AuthProvider>().loadProfile();
-    if (mounted) setState(() => _isSyncing = false);
+    try {
+      await context.read<AuthProvider>().loadProfile();
+    } catch (_) {
+      // loadProfile now swallows its own errors; keep the spinner safe anyway.
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
   }
 
   @override

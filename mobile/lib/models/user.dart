@@ -24,6 +24,10 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final rawRating = json['rating'];
+    final rawReviewCount = json['reviewCount'];
+    final rawSkills = json['skills'];
+
     return User(
       id: json['id'],
       email: json['email'],
@@ -31,11 +35,33 @@ class User {
       phone: json['phone'],
       role: json['role'],
       avatar: json['avatar'],
-      rating: json['rating']?.toDouble(),
-      reviewCount: json['reviewCount'],
-      skills: json['skills'] != null ? List<String>.from(json['skills']) : null,
+      rating: rawRating != null && rawRating.toString().trim().isNotEmpty
+          ? double.tryParse(rawRating.toString())
+          : null,
+      reviewCount: rawReviewCount != null
+          ? int.tryParse(rawReviewCount.toString()) ??
+              (rawReviewCount is num ? rawReviewCount.toInt() : null)
+          : null,
+      skills: _parseSkills(rawSkills),
       isAvailable: json['isAvailable'],
     );
+  }
+
+  static List<String>? _parseSkills(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is String) {
+      final trimmed = raw.trim();
+      if (trimmed.isEmpty) return <String>[];
+      return trimmed
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+    if (raw is List) {
+      return raw.map((s) => s.toString()).toList();
+    }
+    return null;
   }
 
   Map<String, dynamic> toJson() {

@@ -4,7 +4,9 @@ import '../app_constants.dart';
 import '../models/job.dart';
 import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
+import '../providers/review_provider.dart';
 import 'chat_screen.dart';
+import 'rate_job_screen.dart';
 
 class JobListScreen extends StatefulWidget {
   const JobListScreen({super.key});
@@ -105,6 +107,10 @@ class _JobListScreenState extends State<JobListScreen> {
   }
 
   Widget _buildJobCard(Job job, JobProvider jobProvider) {
+    final auth = context.read<AuthProvider>();
+    final reviewProvider = context.read<ReviewProvider>();
+    final currentRole = auth.userRole ?? 'client';
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -188,6 +194,27 @@ class _JobListScreenState extends State<JobListScreen> {
                 ],
               ),
             ],
+            if (job.status == 'completed' &&
+                currentRole == 'client' &&
+                job.handymanId != null &&
+                !reviewProvider.isRated(job.id)) ...[
+              const Divider(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _openRate(job),
+                      icon: const Icon(Icons.star_outline, size: 16),
+                      label: const Text('Rate Handyman'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.warn,
+                        foregroundColor: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -204,6 +231,22 @@ class _JobListScreenState extends State<JobListScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openRate(Job job) async {
+    final submitted = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RateJobScreen(
+          jobId: job.id,
+          revieweeId: job.handymanId ?? '',
+          revieweeName: job.handymanName ?? 'the handyman',
+        ),
+      ),
+    );
+    if (submitted == true && mounted) {
+      setState(() {});
+    }
   }
 
   String _formatDate(DateTime dt) {

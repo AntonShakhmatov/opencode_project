@@ -17,6 +17,8 @@ class ApiService {
     defaultValue: 'http://localhost:3000/api',
   );
 
+  static const Duration _timeout = Duration(seconds: 15);
+
   static Map<String, String> _headers({String? token}) {
     return {
       'Content-Type': 'application/json',
@@ -33,7 +35,7 @@ class ApiService {
       Uri.parse('$baseUrl$path'),
       headers: _headers(token: token),
       body: jsonEncode(body),
-    );
+    ).timeout(_timeout);
     return _decode(response);
   }
 
@@ -44,7 +46,7 @@ class ApiService {
     final response = await http.get(
       Uri.parse('$baseUrl$path'),
       headers: _headers(token: token),
-    );
+    ).timeout(_timeout);
     return _decode(response);
   }
 
@@ -57,7 +59,7 @@ class ApiService {
       Uri.parse('$baseUrl$path'),
       headers: _headers(token: token),
       body: jsonEncode(body),
-    );
+    ).timeout(_timeout);
     return _decode(response);
   }
 

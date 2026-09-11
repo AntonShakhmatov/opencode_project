@@ -10,6 +10,7 @@ import 'create_job_screen.dart';
 import 'job_list_screen.dart';
 import 'profile_screen.dart';
 import 'handyman_jobs_screen.dart';
+import 'reviews_screen.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -308,6 +309,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ReviewsScreen(
+                    userId: auth.userId ?? '',
+                    userName: auth.userName ?? 'You',
+                  ),
+                ),
+              ),
+              icon: const Icon(Icons.star_outline),
+              label: const Text(
+                'View My Ratings',
+                style: TextStyle(fontSize: 15),
               ),
             ),
           ],

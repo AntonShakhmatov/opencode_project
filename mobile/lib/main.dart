@@ -4,6 +4,7 @@ import 'app_constants.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/job_provider.dart';
+import 'providers/review_provider.dart';
 import 'services/socket_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -24,12 +25,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final socketService = SocketService();
+    final reviewProvider = ReviewProvider();
+    reviewProvider.restoreRatedJobs();
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => JobProvider()),
         ChangeNotifierProvider.value(value: socketService),
+        ChangeNotifierProvider.value(value: reviewProvider),
         ProxyProvider<SocketService, ChatProvider>(
           update: (_, socket, __) => ChatProvider(socket),
         ),
